@@ -1,0 +1,48 @@
+﻿@inject IGlobalState GlobalState
+@inject NavigationManager navigation
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Seguridad Usuarios</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        @if (GlobalState.Session == null)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-box-arrow-right"></i> Inicio de sesión
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/home" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-door-fill"></i> Inicio
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/user/find">
+                    <i class="bi bi-search"></i> Consultar
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/user/create">
+                    <i class="bi bi-person-fill"></i> Nuevo
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/logout">
+                    <i class="bi bi-box-arrow-left"></i> Cerrar sesión
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+@code{
+}

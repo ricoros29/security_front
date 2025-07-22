@@ -1,0 +1,103 @@
+﻿@page "/"
+@using BlazorApp.DTO.Security
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Iniciar sesión</PageTitle>
+
+<div class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-md-4 offset-md-4 col-sm-8">
+            <div class="card" style="background-color:rgba(250,250,250,.9)">
+                <div class="card-body px-5 py-5">
+                    <h2 class="card-title text-primary text-center mb-2">Inicio de sesión</h2>
+                    <p class="text-body-secondary small text-center mb-5">Favor de ingresar usuario y contraseña</p>
+                    <EditForm method="post" Model="credentials" OnValidSubmit="AuthenticateUser" FormName="login" Enhance>
+                        <div class="row mb-4">
+                            @* <label for="username" class="col-sm-3 col-form-label">Usuario <span class="text-danger">*</span></label> *@
+                            <div class="col-sm-12">
+                                <InputText id="username" @bind-Value="credentials.Username" class="form-control credential" autocomplete="off" placeholder="Usuario" />
+                                <ValidationMessage For="() => credentials.Username" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="row mb-5">
+                            @* <label for="password" class="col-sm-3 col-form-label">Contraseña <span class="text-danger">*</span></label> *@
+                            <div class="col-sm-12">
+                                <InputText type="password" id="password" @bind-Value="credentials.Password" class="form-control credential" placeholder="Contraseña" />
+                                <ValidationMessage For="() => credentials.Password" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            @* <div class="col-sm-3"></div> *@
+                            <div class="col-sm-12">
+                                <div class="d-grid gap-2 mb-2">
+                                    <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+                                        Ingresar
+                                        @if (IsLoading)
+                                        {
+                                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <DataAnnotationsValidator />
+                    </EditForm>
+                    @if (!string.IsNullOrEmpty(error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@error</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@code {
+    [SupplyParameterFromForm]
+    private CredentialsDTO credentials { get; set; } = new();
+    private string error { get; set; } = string.Empty;
+    private bool IsLoading = false;
+    private bool IsSubmitting { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        // redirect to home if already logged in
+        if (GlobalState.Session != null)
+        {
+            navigation.NavigateTo("/home");
+        }
+    }
+
+    protected async Task AuthenticateUser()
+    {
+        if (IsSubmitting)
+            return;
+
+        try
+        {
+            IsSubmitting = true;
+            IsLoading = true;
+
+            var result = await _service.LoginAsync(credentials);
+
+            if (result != null)
+            {
+                GlobalState.Token = result.Token;
+                GlobalState.Session = result;
+                navigation.NavigateTo("/home");
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+        finally
+        {
+            IsSubmitting = false;
+            IsLoading = false;
+        }
+    }
+
+}

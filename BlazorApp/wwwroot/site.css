@@ -1,0 +1,39 @@
+﻿body {
+}
+
+input {
+    text-transform: uppercase;
+}
+
+.credential {
+    text-transform: none !important;
+}
+
+
+/* For better browser compatibility */
+input::-webkit-input-placeholder { /* Chrome, Safari, Edge */
+    text-transform: none;
+    color: #1861ac !important;
+}
+
+input:-moz-placeholder { /* Firefox 18- */
+    text-transform: none;
+    color: #1861ac !important;
+}
+
+input::-moz-placeholder { /* Firefox 19+ */
+    text-transform: none;
+    color: #1861ac !important;
+}
+
+input:-ms-input-placeholder { /* IE 10+ */
+    text-transform: none;
+    color: #1861ac !important;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

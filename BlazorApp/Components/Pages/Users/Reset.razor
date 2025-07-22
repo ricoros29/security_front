@@ -1,0 +1,184 @@
+﻿@page "/user/reset"
+@inject ILogger<IUser> _logger
+@inject IConfiguration configuration
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Resetear contraseña</PageTitle>
+
+<div class="container">
+    <h1>Resetear contraseña</h1>
+    <div class="card">
+        <div class="card-body">
+            @if (IsLoading)
+            {
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+            else if (userReset != null)
+            {
+                <EditForm method="post" Model="userReset" OnValidSubmit="ResetPassword" FormName="resetpassword" Enhance>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="cuenta" class="form-label">Cuenta de Usuario <span class="text-danger">*</span></label>
+                            <InputText id="cuenta" @bind-Value="userReset.Cuenta" class="form-control" disabled="true" />
+                            <ValidationMessage For="() => userReset.Cuenta" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                            <InputText type="password" id="password" @bind-Value="userReset.Password" class="form-control" />
+                            <ValidationMessage For="() => userReset.Password" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="confirm" class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
+                            <InputText type="password" id="confirm" @bind-Value="userReset.PasswordConfirm" class="form-control" />
+                            <ValidationMessage For="() => userReset.PasswordConfirm" class="text-danger" />
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-grid gap-2 d-md-block">
+                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+                                    @if (IsLoading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                                    }
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <DataAnnotationsValidator />
+                </EditForm>
+            }
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-success mt-3 mb-0">@message</div>
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+        </div>
+    </div>
+    @if (userReset != null)
+    {
+        <div class="alert alert-light" role="alert">
+            <a class="link-primary" href="@($"/user/edit?id={userReset?.IdUsuario}")">Editar</a><span> | </span>
+            <a class="link-primary" href="@($"/user/details?id={userReset?.IdUsuario}")">Detalle</a><span> | </span>
+            <a class="link-primary" href="@($"/user/find")">Ir a Consulta</a>
+        </div>
+    }
+</div>
+
+@code {
+    private string token = string.Empty;
+    private bool IsLoading = false;
+    private string message = string.Empty;
+    private string error = string.Empty;
+    protected bool IsDisabled { get; set; } = false;
+    protected bool IsSubmitting { get; set; } = false;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ResetDTO? userReset { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Id <= 0)
+            {
+                navigation.NavigateTo($"user/notfound");
+            }
+            else
+            {
+                this.IsLoading = true;
+                this.token = GlobalState.Token;
+
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("id", Id.ToString());
+
+                var user = await _service.GetAsync<UserFindDTO?>("/api/user/GetUserById", parameters, token);
+
+                if (user != null)
+                {
+                    userReset = new ResetDTO()
+                        {
+                            IdUsuario = user.IdUsuario,
+                            Cuenta = user.Cuenta
+                        };
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+            _logger.LogError(ex.Message);
+        }
+        finally
+        {
+            this.IsLoading = false;
+        }
+    }
+
+    protected async Task ResetPassword()
+    {
+        if (IsSubmitting)
+            return;
+
+        try
+        {
+            this.IsLoading = true;
+            this.IsSubmitting = true;
+            this.IsDisabled = true;
+            this.message = string.Empty;
+            this.error = string.Empty;
+
+            if (userReset.Password != userReset.PasswordConfirm)
+            {
+                error = "La contraseña y su confirmación no coinciden.";
+                return;
+            }
+
+            _logger.LogInformation("JSON: {0}", Newtonsoft.Json.JsonConvert.SerializeObject(this.userReset));
+            var actualizo = await _service.PutAsync<bool>($"/api/user/Reset/{Id}", userReset, token);
+
+            if (actualizo == true)
+                message = $"La contraseña ha sido actualizada.";
+            //navigation.NavigateTo($"user/details?id={user.IdUsuario}");
+            else
+                message = $"No hay datos por actualizar.";
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+            _logger.LogError(ex.Message);
+        }
+        finally
+        {
+            this.IsLoading = false;
+            this.IsSubmitting = false;
+            this.IsDisabled = false;
+        }
+    }
+
+}

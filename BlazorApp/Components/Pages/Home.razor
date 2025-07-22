@@ -1,0 +1,55 @@
+﻿@page "/home"
+@inherits LayoutComponentBase
+@inject NavigationManager navigation
+@* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage *@
+@rendermode InteractiveServer
+
+<PageTitle>Seguridad Usuarios</PageTitle>
+
+<div class="container-fluid">
+    <h1>Bienvenid@@</h1>
+    <p class="text-capitalize fw-bold">@Username</p>
+    <p>Aplicación web para gestionar usuarios del Registro Nacional de Personas Desaparecidas o No Localizadas (RNPDNO).</p>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success mt-3 mb-0">@message</div>
+}
+
+@code {
+    private string token = string.Empty;
+    private string Username = string.Empty;
+    private string message { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+        else
+        {
+            Username = GlobalState.Session.Username;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            try
+            {
+                //             //GlobalState.Token = await _service.GetToken();
+                //             // await sessionStorage.SetItemAsync("JWToken", GlobalState.Token);
+                //             // var _token = await sessionStorage.GetItemAsync<string>("JWToken");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+    }
+}

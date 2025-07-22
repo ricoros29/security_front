@@ -1,0 +1,13 @@
+﻿@page "/logout"
+@inject IGlobalState GlobalState
+@inject NavigationManager navigation
+
+<h3>Logout</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        GlobalState.Session = null;
+        navigation.NavigateTo("/");
+    }
+}

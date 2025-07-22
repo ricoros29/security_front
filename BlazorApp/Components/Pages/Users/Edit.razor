@@ -1,0 +1,283 @@
+﻿@page "/user/edit"
+@inject ILogger<IUser> _logger
+@inject IConfiguration configuration
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Editar usuario</PageTitle>
+
+<div class="container-fluid">
+    <h1>Editar usuario</h1>
+    <div class="card">
+        <div class="card-body">
+            @if (IsLoading)
+            {
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+            else if (user != null)
+            {
+                <EditForm method="post" Model="user" OnValidSubmit="EditUser" FormName="edit" Enhance>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="cuenta" class="form-label">Cuenta de Usuario <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="user.Cuenta" class="form-control" disabled="true" />
+                            <ValidationMessage For="() => user.Cuenta" class="text-danger" />
+                        </div>
+                        <div class="col-md-8">
+                            @*  <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                            <InputText type="password" id="password" @bind-Value="user.Password" class="form-control" />
+                            <ValidationMessage For="() => user.Password" class="text-danger" /> *@
+                        </div>
+                        <div class="col-md-4">
+                            <label for="username" class="form-label">Nombre <span class="text-danger">*</span></label>
+                            <InputText id="username" @bind-Value="user.Nombre" class="form-control" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user.Nombre" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="paterno" class="form-label">Apellido Paterno <span class="text-danger">*</span></label>
+                            <InputText id="paterno" @bind-Value="user.ApellidoPaterno" class="form-control" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user.ApellidoPaterno" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="materno" class="form-label">Apellido Materno</label>
+                            <InputText id="materno" @bind-Value="user.ApellidoMaterno" class="form-control" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user.ApellidoMaterno" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="rfc" class="form-label">RFC <span class="text-danger">*</span></label>
+                            <InputText id="rfc" @bind-Value="user.Rfc" class="form-control" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user.Rfc" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="correoelectronico" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+                            <InputText id="correoelectronico" type="email" @bind-Value="user!.CorreoElectronico"
+                                       class="form-control" placeholder="email@example.com" aria-label="CorreoElectronico" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user!.CorreoElectronico" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="numeroempleado" class="form-label">Número de Empleado <span class="text-danger">*</span></label>
+                            <InputText id="numeroempleado" @bind-Value="user.NoEmpleado" class="form-control" disabled="true" />
+                            <ValidationMessage For="() => user.NoEmpleado" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="idestado" class="form-label">Entidad Federativa <span class="text-danger">*</span></label>
+                            <InputSelect id="idestado" class="form-select" @bind-Value="user.IdEstado" disabled="true">
+                                @foreach (var item in ListaEstados)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-8">
+                            <label for="iddependencia" class="form-label">Dependencia <span class="text-danger">*</span></label>
+                            <InputSelect id="iddependencia" class="form-select" @bind-Value="user.IdDependenciaOrigen" disabled="true">
+                                @foreach (var item in ListaDependencias)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="cargo" class="form-label">Cargo <span class="text-danger">*</span></label>
+                            <InputText id="cargo" @bind-Value="user.Cargo" class="form-control" disabled="@IsDisabled" />
+                            <ValidationMessage For="() => user.Cargo" class="text-danger" />
+                        </div>
+                        <div class="col-md-8">
+                            <label for="unidadadministrativa" class="form-label">Unidad Administrativa <span class="text-danger">*</span></label>
+                            <InputText id="unidadadministrativa" @bind-Value="user.UnidadAdministrativa"
+                                       class="form-control" disabled="true" />
+                            <ValidationMessage For="() => user.UnidadAdministrativa" class="text-danger" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="idmodulo" class="form-label">Módulo <span class="text-danger">*</span></label>
+                            <InputSelect id="idmodulo" class="form-select" @bind-Value="user.IdModulo" disabled="true">
+                                @foreach (var item in ListaModulos)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="idrol" class="form-label">Rol <span class="text-danger">*</span></label>
+                            <InputSelect id="idrol" class="form-select" @bind-Value="user.IdRol" disabled="@IsDisabled">
+                                @foreach (var item in ListaRoles)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="idestatus" class="form-label">Estatus <span class="text-danger">*</span></label>
+                            <InputSelect id="idestatus" class="form-select" @bind-Value="user.IdEstatus" disabled="@IsDisabled">
+                                <option value="false">INACTIVO</option>
+                                <option value="true">ACTIVO</option>
+                            </InputSelect>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-grid gap-2 d-md-block">
+                                @* <button type="button" class="btn btn-primary" @onclick="EnableForm" disabled="@(!IsSubmitting)">Editar</button> *@
+                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+                                    @if (IsLoading)
+                                    {
+                                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                                    }
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <DataAnnotationsValidator />
+                </EditForm>
+            }
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-success mt-3 mb-0">@message</div>
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+        </div>
+    </div>
+    @if (user != null)
+    {
+        <div class="alert alert-light" role="alert">
+            <a class="link-primary" href="@($"/user/details?id={user?.IdUsuario}")">Detalle</a><span> | </span>
+            @if (user?.IdEstatus == true)
+            {
+                <a class="link-primary" href="@($"/user/reset?id={user?.IdUsuario}")">Resetear</a>
+                <span> | </span>
+            }
+            <a class="link-primary" href="@($"/user/find")">Ir a Consulta</a>
+        </div>
+    }
+</div>
+
+
+@code {
+    private string token = string.Empty;
+    private bool IsLoading = false;
+    private string message = string.Empty;
+    private string error = string.Empty;
+    protected bool IsDisabled { get; set; } = false;
+    protected bool IsSubmitting { get; set; } = false;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private UserFindDTO? user { get; set; }
+
+    public List<SelectListItem> ListaEstados { get; set; } = new();
+    public List<SelectListItem> ListaDependencias { get; set; } = new();
+    public List<SelectListItem> ListaModulos { get; set; } = new();
+    public List<SelectListItem> ListaRoles { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            if (Id <= 0)
+            {
+                navigation.NavigateTo($"user/notfound");
+            }
+            else
+            {
+                this.IsLoading = true;
+                this.token = GlobalState.Token;
+                await PoblarCombos();
+
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("id", Id.ToString());
+
+                user = await _service.GetAsync<UserFindDTO?>("/api/user/GetUserById", parameters, token);
+
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+            _logger.LogError(ex.Message);
+        }
+        finally
+        {
+            this.IsLoading = false;
+        }
+    }
+
+    protected async Task EditUser()
+    {
+        if (IsSubmitting)
+            return;
+
+        try
+        {
+            this.IsLoading = true;
+            this.IsSubmitting = true;
+            this.IsDisabled = true;
+            this.message = string.Empty;
+            this.error = string.Empty;
+
+            _logger.LogInformation("JSON: {0}", Newtonsoft.Json.JsonConvert.SerializeObject(this.user));
+            var actualizo = await _service.PutAsync<bool>($"/api/user/Edit/{Id}", user, token);
+
+            if (actualizo == true)
+                message = $"La información ha sido actualizada.";
+            //navigation.NavigateTo($"user/details?id={user.IdUsuario}");
+            else
+                message = $"No hay datos por actualizar.";
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+            _logger.LogError(ex.Message);
+        }
+        finally
+        {
+            this.IsLoading = false;
+            this.IsSubmitting = false;
+            this.IsDisabled = false;
+        }
+    }
+
+    private void EnableForm()
+    {
+        IsSubmitting = false;
+        IsDisabled = false;
+        message = "Dió clic en Habilitar edición " + DateTime.UtcNow.ToUniversalTime();
+    }
+
+    private async Task PoblarCombos()
+    {
+        try
+        {
+            this.ListaEstados = await _service.GetCatalogo("estados", token);
+            this.ListaDependencias = await _service.GetCatalogo("dependenciaorigen", token);
+            this.ListaModulos = await _service.GetCatalogo("modulos", token);
+            this.ListaRoles = await _service.GetCatalogo("roles", token);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+}

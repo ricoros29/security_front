@@ -1,0 +1,127 @@
+﻿@page "/user/details"
+@inject ILogger<IUser> _logger
+@inject NavigationManager navigation
+@attribute [StreamRendering]
+
+<PageTitle>Detalle de usuario</PageTitle>
+
+<div class="container-fluid">
+    <h1>Detalle de usuario</h1>
+    <div class="card">
+        <div class="card-body">
+            @if (loading)
+            {
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+            else if (user != null)
+            {
+                <dl class="row">
+                    <dt class="col-sm-2">Estatus</dt>
+                    <dd class="col-sm-10 fw-bolder @(user.IdEstatus == true ? "text-primary" : "text-danger")">@user.Estatus</dd>
+                    <dt class="col-sm-2">Cuenta</dt>
+                    <dd class="col-sm-10">@user.Cuenta</dd>
+                    <dt class="col-sm-2">Nombre</dt>
+                    <dd class="col-sm-10">@user.Nombre</dd>
+                    <dt class="col-sm-2">Apellido paterno</dt>
+                    <dd class="col-sm-10">@user.ApellidoPaterno</dd>
+                    <dt class="col-sm-2">Apellido materno</dt>
+                    <dd class="col-sm-10">@user.ApellidoMaterno</dd>
+                    <dt class="col-sm-2">RFC</dt>
+                    <dd class="col-sm-10">@user.Rfc</dd>
+                    <dt class="col-sm-2">Correo electrónico</dt>
+                    <dd class="col-sm-10">@user.CorreoElectronico</dd>
+                    <dt class="col-sm-2">Entidad federativa</dt>
+                    <dd class="col-sm-10">@user.Estado</dd>
+                    <dt class="col-sm-2">Dependencia</dt>
+                    <dd class="col-sm-10">@user.DependenciaOrigen</dd>
+                    <dt class="col-sm-2">Cargo</dt>
+                    <dd class="col-sm-10">@user.Cargo</dd>
+                    <dt class="col-sm-2">Unidad administrativa</dt>
+                    <dd class="col-sm-10">@user.UnidadAdministrativa</dd>
+                    <dt class="col-sm-2">Rol</dt>
+                    <dd class="col-sm-10">@user.Rol</dd>
+                    <dt class="col-sm-2">Módulo</dt>
+                    <dd class="col-sm-10">@user.Modulo</dd>
+                </dl>
+            }
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-success mt-3 mb-0">@message</div>
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+        </div>
+    </div>
+    @if (user != null)
+    {
+        <div class="alert alert-light" role="alert">
+            <a class="link-primary" href="@($"/user/edit?id={user?.IdUsuario}")">Editar</a><span> | </span>
+            @if (user?.IdEstatus == true)
+            {
+                <a class="link-primary" href="@($"/user/reset?id={user?.IdUsuario}")">Resetear</a><span> | </span>
+            }
+            <a class="link-primary" href="@($"/user/find")">Ir a Consulta</a>
+        </div>
+    }
+</div>
+
+@code {
+    private string token = string.Empty;
+    private bool loading = false;
+    private string message = string.Empty;
+    private string error = string.Empty;
+
+    private UserFindDTO? user;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            if (Id <= 0)
+            {
+                navigation.NavigateTo($"user/notfound");
+            }
+            else
+            {
+                loading = true;
+                this.token = GlobalState.Token;
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("id", Id.ToString());
+
+                user = await _service.GetAsync<UserFindDTO?>("/api/user/GetUserById", parameters, token);
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+            _logger.LogError(ex.Message);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}

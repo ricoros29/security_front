@@ -1,0 +1,15 @@
+﻿@page "/user/notfound"
+@inject NavigationManager navigation
+
+<h1>Not Found</h1>
+
+@code{
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+    }
+}

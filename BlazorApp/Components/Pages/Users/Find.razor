@@ -1,0 +1,135 @@
+﻿@page "/user/find"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject NavigationManager navigation
+@* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Consultar usuario</PageTitle>
+
+<div class="container-fluid">
+    <h1>Consultar usuario</h1>
+    <div class="card">
+        <div class="card-body">
+            <div class="row g-3 mt-1">
+                <div class="col-sm-12 col-md-12">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Buscar &nbsp;<i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" @bind="searchText" @bind:event="oninput" @bind:after="FindUsers" placeholder="Ingresar al menos 3 caracteres del nombre completo o cuenta de usuario" aria-label="Buscar usuario por nombre o cuenta" aria-describedby="inputGroup-sizing-sm">
+                    </div>
+                </div>
+            </div>
+            @if (loading)
+            {
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+            else
+            {
+                @if (FilteredUsers != null)
+                {
+                    <div class="mt-3 mb-3 overflow-auto" style="width:100%;">
+                        <QuickGrid Class="table table-striped table-responsive custom-class" custom-attribute="value" Items="FilteredUsers" Pagination="pagination">
+                            <PropertyColumn Property="user => user!.Nombre" Sortable="true" />
+                            <PropertyColumn Property="user => user!.ApellidoPaterno" Title="Apellido Paterno" Sortable="true" />
+                            <PropertyColumn Property="user => user!.ApellidoMaterno" Title="Apellido Materno" Sortable="true" />
+                            <PropertyColumn Property="user => user!.Cuenta" Sortable="true" />
+                            <PropertyColumn Property="user => user!.Estatus" Sortable="true"/>
+
+                            <TemplateColumn Context="user" Title="Acciones">
+                                <a class="link-primary" href="@($"user/details?id={user?.IdUsuario}")">Detalle</a><span> | </span>
+                                <a class="link-primary" href="@($"user/edit?id={user?.IdUsuario}")">Editar</a><span> | </span>
+                                @if (user?.IdEstatus == true)
+                                {
+                                    <a class="link-primary" href="@($"user/reset?id={user?.IdUsuario}")">Resetear</a>
+                                }
+                            </TemplateColumn>
+                        </QuickGrid>
+                    </div>
+                    <Paginator State="pagination" />
+                }
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+        </div>
+    </div>
+    <div class="alert alert-light" role="alert">
+        <a class="link-primary" href="@($"/user/create")">Nuevo usuario</a>
+    </div>
+</div>
+
+@code {
+    private string token = string.Empty;
+    private bool loading = false;
+    private string error = string.Empty;
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    private string searchText = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (GlobalState.Session == null || GlobalState.Session.Expires < DateTime.UtcNow)
+        {
+            GlobalState.Session = null;
+            navigation.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            this.token = GlobalState.Token;
+            //var _token = await sessionStorage.GetItemAsync<string>("JWToken");
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+    }
+
+    private IQueryable<UserFindDTO?>? FilteredUsers;
+
+    public async Task FindUsers()
+    {
+        FilteredUsers = null;
+        error = string.Empty;
+
+        try
+        {
+            loading = true;
+
+            if (!string.IsNullOrEmpty(searchText) && searchText.Length >= 3)
+            {
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("texto", searchText);
+
+                var lista = await _service.GetAsync<List<UserFindDTO?>>("/api/user/FindUsers", parameters, token);
+
+                if (lista != null)
+                {
+                    FilteredUsers = lista.AsQueryable();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+        finally
+        {
+            loading = false;
+        }
+
+        //return ListUsers;
+    }
+
+}
