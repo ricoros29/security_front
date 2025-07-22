@@ -4,16 +4,16 @@ namespace BlazorApp.DTO.Users
 {
     public class ResetDTO
     {
-        [Required(ErrorMessage = "Requerido")]
+        [Required(ErrorMessage = "Obligatorio")]
         public int IdUsuario { get; set; }
 
-        [Required(ErrorMessage = "Requerido")]
+        [Required(ErrorMessage = "Obligatorio")]
         public string Cuenta { get; set; } = string.Empty;
 
-        [Required (ErrorMessage ="Requerido")]
+        [Required (ErrorMessage ="Obligatorio")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Requerido")]
+        [Required(ErrorMessage = "Obligatorio")]
         public string PasswordConfirm { get; set; } = string.Empty;
     }
 }
