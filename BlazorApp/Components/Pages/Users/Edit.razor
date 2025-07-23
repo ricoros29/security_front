@@ -130,7 +130,7 @@
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
-                                    Guardar
+                                    Guardar<i class="bi bi-floppy2-fill"></i>
                                 </button>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
             else
             {
                 this.IsLoading = true;
-                this.token = GlobalState.Token;
+                this.token = GlobalState.Session.Token;
                 await PoblarCombos();
 
                 var parameters = new Dictionary<string, string>();

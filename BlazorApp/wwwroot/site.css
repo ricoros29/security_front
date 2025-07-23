@@ -37,3 +37,7 @@ input:-ms-input-placeholder { /* IE 10+ */
     right: 0.75rem;
     top: 0.5rem;
 }
+
+.bi{
+    margin: 0px 5px;
+}

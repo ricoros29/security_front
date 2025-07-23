@@ -87,7 +87,7 @@
     {
         try
         {
-            this.token = GlobalState.Token;
+            this.token = GlobalState.Session.Token;
             //var _token = await sessionStorage.GetItemAsync<string>("JWToken");
         }
         catch (Exception ex)

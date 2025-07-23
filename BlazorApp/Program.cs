@@ -6,6 +6,10 @@ using Blazored.SessionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Habilitar logs
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetSection("WebAPI:uri").Value ?? string.Empty) });
 builder.Services.AddScoped<IService, HttpService>();
 builder.Services.AddSingleton<IGlobalState, GlobalState>();

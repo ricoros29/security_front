@@ -14,12 +14,10 @@ namespace BlazorApp.Services;
 public class HttpService : IService
 {
     private HttpClient _httpClient;
-    private IConfiguration _configuration;
 
-    public HttpService(HttpClient httpClient, IConfiguration configuration)
+    public HttpService(HttpClient httpClient)
     {
         this._httpClient = httpClient;
-        this._configuration = configuration;
     }
 
     public async Task<ResultLoginDTO> LoginAsync(CredentialsDTO credentials)

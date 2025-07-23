@@ -107,7 +107,7 @@
             else
             {
                 loading = true;
-                this.token = GlobalState.Token;
+                this.token = GlobalState.Session.Token;
                 var parameters = new Dictionary<string, string>();
                 parameters.Add("id", Id.ToString());
 
