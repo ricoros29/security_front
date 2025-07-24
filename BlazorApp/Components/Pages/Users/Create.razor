@@ -4,6 +4,8 @@
 @* @inject Blazored.SessionStorage.ISessionStorageService sessionStorage *@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
+@inject IJSRuntime JS
+
 
 <PageTitle>Nuevo usuario</PageTitle>
 
@@ -29,7 +31,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label for="cuenta" class="form-label">Cuenta de Usuario <span class="text-danger">*</span></label>
-                            <InputText id="cuenta" @bind-Value="user!.Cuenta" @bind-Value:after="ValidateAccount" class="form-control" disabled="@IsDisabled" />
+                            <InputText id="cuenta" @bind-Value="user!.Cuenta" @bind-Value:after="OnValidateAccount" class="form-control" disabled="@IsDisabled" />
                             <ValidationMessage For="() => user!.Cuenta" class="text-danger" />
                         </div>
                         <div class="col-md-4">
@@ -73,7 +75,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="idestado" class="form-label">Entidad Federativa <span class="text-danger">*</span></label>
-                            <InputSelect id="idestado" class="form-select" @bind-Value="user!.IdEstado" disabled="@IsDisabled">
+                            <InputSelect id="idestado" class="form-select" @bind-Value="user!.IdEstado" @bind-Value:after="OnChangedEstado" disabled="@IsDisabled">
                                 @if (ListaEstados != null)
                                 {
                                     foreach (var item in ListaEstados)
@@ -108,7 +110,8 @@
                         </div>
                         <div class="col-md-4">
                             <label for="idmodulo" class="form-label">Módulo <span class="text-danger">*</span></label>
-                            <InputSelect id="idmodulo" class="form-select" @bind-Value="user!.IdModulo" disabled="@IsDisabled">
+                            <InputSelect id="idmodulo" class="form-select" @bind-Value="user!.IdModulo"
+                                         @bind-Value:after="OnChangedModulo" disabled="@IsDisabled">
                                 @if (ListaModulos != null)
                                 {
                                     foreach (var item in ListaModulos)
@@ -219,6 +222,10 @@
         if (IsSubmitting)
             return;
 
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "¿Deseas continuar?");
+        if (!confirmed)
+            return;
+
         try
         {
             this.IsLoading = true;
@@ -228,7 +235,7 @@
             this.error = string.Empty;
 
             _logger.LogInformation("JSON: {0}", JsonConvert.SerializeObject(user));
-            
+
             var userSave = await _service.PostAsync<UserDTO?>("/api/user/Create", user, token);
 
             if (userSave != null)
@@ -264,9 +271,7 @@
         try
         {
             this.ListaEstados ??= await _service.GetCatalogo("estados", token);
-            this.ListaDependencias ??= await _service.GetCatalogo("dependenciaorigen", token);
             this.ListaModulos ??= await _service.GetCatalogo("modulos", token);
-            this.ListaRoles ??= await _service.GetCatalogo("roles", token);
         }
         catch (Exception)
         {
@@ -274,7 +279,7 @@
         }
     }
 
-    private async Task ValidateAccount()
+    async Task OnValidateAccount()
     {
         this.IsLoading = true;
         this.error = string.Empty;
@@ -298,6 +303,7 @@
         catch (Exception ex)
         {
             this.error = ex.Message;
+            _logger.LogError(ex.Message);
             user.Cuenta = string.Empty;
         }
         finally
@@ -306,4 +312,45 @@
         }
     }
 
+    async Task OnChangedModulo()
+    {
+        try
+        {
+            user.IdRol = 0;
+            if (user.IdModulo == null || user.IdModulo == 0)
+            {
+                this.ListaRoles = null;
+            }
+            else
+            {
+                List<SelectListItem> list = await _service.GetCatalogo("roles", token, user.IdModulo);
+                this.ListaRoles = list;
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+    }
+
+    async Task OnChangedEstado()
+    {
+        try
+        {
+            user.IdDependenciaOrigen = 0;
+            if (user.IdEstado == null || user.IdEstado == 0)
+            {
+                this.ListaDependencias = null;
+            }
+            else
+            {
+                List<SelectListItem> list = await _service.GetCatalogo("dependenciaorigen", token, user.IdEstado);
+                this.ListaDependencias = list;
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+    }
 }

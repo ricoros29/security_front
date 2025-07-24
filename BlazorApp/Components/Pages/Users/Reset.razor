@@ -4,6 +4,7 @@
 @inject NavigationManager navigation
 @rendermode InteractiveServer
 @attribute [StreamRendering]
+@inject IJSRuntime JS
 
 <PageTitle>Resetear contraseña</PageTitle>
 
@@ -68,6 +69,7 @@
             }
         </div>
     </div>
+    @* <ConfirmMessage ConfirmedChanged="Confirm" /> *@
     @if (userReset != null)
     {
         <div class="alert alert-light" role="alert">
@@ -145,6 +147,9 @@
         if (IsSubmitting)
             return;
 
+        if (!await JS.InvokeAsync<bool>("confirm", $"¿Deseas continuar?"))
+            return;
+
         try
         {
             this.IsLoading = true;
@@ -180,5 +185,10 @@
             this.IsDisabled = false;
         }
     }
+
+    // public void Confirm(bool test)
+    // {
+    //     Console.WriteLine(test);
+    // }
 
 }

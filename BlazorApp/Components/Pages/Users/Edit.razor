@@ -4,6 +4,7 @@
 @inject NavigationManager navigation
 @rendermode InteractiveServer
 @attribute [StreamRendering]
+@inject IJSRuntime JS
 
 <PageTitle>Editar usuario</PageTitle>
 
@@ -229,8 +230,13 @@
         if (IsSubmitting)
             return;
 
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "¿Deseas continuar?");
+        if (!confirmed)
+            return;
+
         try
         {
+
             this.IsLoading = true;
             this.IsSubmitting = true;
             this.IsDisabled = true;
