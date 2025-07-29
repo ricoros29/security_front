@@ -153,15 +153,10 @@ public class HttpService : IService
         {
             if (parameters.Count > 0)
             {
-                url += "?";
-
                 foreach (KeyValuePair<string, string> param in parameters)
                 {
-                    url += $"{param.Key}={param.Value}&";
+                    url += $"/{param.Value}";
                 }
-
-
-                url = url.Substring(0, url.Length - 1);
             }
 
             if (!string.IsNullOrEmpty(token))
@@ -170,14 +165,6 @@ public class HttpService : IService
             }
 
             using HttpResponseMessage response = await _httpClient.GetAsync(url);
-
-            //if (response is { StatusCode: >= HttpStatusCode.BadRequest })
-            //{
-            //    throw new HttpRequestException(
-            //        "Something went wrong", inner: null, response.StatusCode);
-            //}
-            //response.EnsureSuccessStatusCode();
-            //return await response.Content.ReadFromJsonAsync<T>();
 
             if (response.IsSuccessStatusCode)
             {
@@ -206,68 +193,6 @@ public class HttpService : IService
         //{
         //    throw new Exception($"Not found: {ex.Message}");
         //}
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
-    public T? Get<T>(string endpoint, Dictionary<string, string> parameters, string? token = null) where T : new()
-    {
-        T? data = default;
-        var url = endpoint;
-
-        try
-        {
-            if (parameters.Count > 0)
-            {
-                url += "?";
-
-                foreach (KeyValuePair<string, string> param in parameters)
-                {
-                    url += $"{param.Key}={param.Value}&";
-                }
-
-
-                url = url.Substring(0, url.Length - 1);
-            }
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            var response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
-
-            if (response.IsSuccessStatusCode)
-            {
-                var json = response.Content.ReadAsStringAsync();
-                data = JsonConvert.DeserializeObject<T>(json.Result.ToString());
-            }
-            else
-            {
-                var json = response.Content.ReadAsStringAsync();
-                throw new Exception(json.Result);
-
-                //dynamic res = JsonConvert.DeserializeObject(json.Result);
-                //string message = string.Empty;
-
-                //if (res != null)
-                //{
-                //    Newtonsoft.Json.Linq.JObject respService = res;
-                //    //resp = JsonConvert.DeserializeObject<RespuestaViewModel>(res.result.ToString());
-                //    message = response.ReasonPhrase + ". " + respService["errors"].ToString();
-                //}
-                //else
-                //{
-                //    message = response.ReasonPhrase + ". " + res.Result;
-                //}
-
-                //throw new Exception(message);
-            }
-
-            return data;
-        }
         catch (Exception)
         {
             throw;

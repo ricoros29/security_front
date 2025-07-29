@@ -30,7 +30,7 @@ public class UserDTO : IUser
     [Required (ErrorMessage ="Obligatorio")]
     public short? IdDependenciaOrigen { get; set; }
     
-    [Required (ErrorMessage ="Obligatorio")]
+    //[Required (ErrorMessage ="Obligatorio")]
     [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten caracteres numéricos.")]
     public string? NoEmpleado { get; set; }
 

@@ -2,7 +2,6 @@ using BlazorApp.Components;
 using BlazorApp.DTO;
 using BlazorApp.Interfaces;
 using BlazorApp.Services;
-using Blazored.SessionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +12,18 @@ builder.Logging.AddConsole();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetSection("WebAPI:uri").Value ?? string.Empty) });
 builder.Services.AddScoped<IService, HttpService>();
 builder.Services.AddSingleton<IGlobalState, GlobalState>();
-builder.Services.AddBlazoredSessionStorage();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.Expiration = TimeSpan.FromHours(1);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -30,7 +36,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 
 app.UseAntiforgery();
 

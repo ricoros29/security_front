@@ -211,7 +211,8 @@
                 parameters.Add("id", Id.ToString());
 
                 user = await _service.GetAsync<UserFindDTO?>("/api/user/GetUserById", parameters, token);
-
+                this.ListaRoles = await _service.GetCatalogo("roles", token, user?.IdModulo);
+                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -279,11 +280,31 @@
             this.ListaEstados = await _service.GetCatalogo("estados", token);
             this.ListaDependencias = await _service.GetCatalogo("dependenciaorigen", token);
             this.ListaModulos = await _service.GetCatalogo("modulos", token);
-            this.ListaRoles = await _service.GetCatalogo("roles", token);
         }
         catch (Exception)
         {
             throw;
         }
     }
+
+    async Task OnChangedModulo()
+    {
+        try
+        {
+            if (user.IdModulo == null || user.IdModulo == 0)
+            {
+                this.ListaRoles = null;
+            }
+            else
+            {
+                List<SelectListItem> list = await _service.GetCatalogo("roles", token, user.IdModulo);
+                this.ListaRoles = list;
+            }
+        }
+        catch (Exception ex)
+        {
+            this.error = ex.Message;
+        }
+    }
+
 }

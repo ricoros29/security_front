@@ -69,8 +69,8 @@
                             <ValidationMessage For="() => user!.CorreoElectronico" class="text-danger" />
                         </div>
                         <div class="col-md-4">
-                            <label for="numeroempleado" class="form-label">Número de Empleado <span class="text-danger">*</span></label>
-                            <InputText id="numeroempleado" @bind-Value="user!.NoEmpleado" class="form-control" disabled="@IsDisabled" />
+                            <label for="numeroempleado" class="form-label">Número de Empleado</label>
+                            <InputText id="numeroempleado" @bind-Value="user!.NoEmpleado" class="form-control" disabled="true" />
                             <ValidationMessage For="() => user!.NoEmpleado" class="text-danger" />
                         </div>
                         <div class="col-md-4">
@@ -296,6 +296,7 @@
                 if (ExistAccount)
                 {
                     this.error = $"Ya existe un usuario con la cuenta {user.Cuenta.ToUpper()}";
+                    //await JS.InvokeVoidAsync("alert", $"Ya existe un usuario con la cuenta {user.Cuenta.ToUpper()}");
                     user.Cuenta = string.Empty;
                 }
             }
