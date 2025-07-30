@@ -25,6 +25,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+builder.Services.AddBlazorBootstrap();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

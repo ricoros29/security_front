@@ -10,20 +10,20 @@ namespace BlazorApp.DTO.Users
 
         [Required(ErrorMessage = "Obligatorio")]
         [MaxLength(50, ErrorMessage = "Ingresar máximo 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
+        //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
         public string? Nombre { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
         [MaxLength(50, ErrorMessage = "Ingresar máximo 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
+        //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
         public string? ApellidoPaterno { get; set; }
 
         [MaxLength(50, ErrorMessage = "Ingresar máximo 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
+        //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
         public string? ApellidoMaterno { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
-        [RegularExpression(@"^[a-zA-z_0-9]+$", ErrorMessage = "Solo se permiten caracteres alfanuméricos.")]
+        //[RegularExpression(@"^[a-zA-z_0-9]+$", ErrorMessage = "Solo se permiten caracteres alfanuméricos.")]
         public string? Cuenta { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
@@ -32,28 +32,28 @@ namespace BlazorApp.DTO.Users
         [Required(ErrorMessage = "Obligatorio")]
         public short? IdDependenciaOrigen { get; set; }
 
-        [Required(ErrorMessage = "Obligatorio")]
-        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten caracteres numéricos.")]
+        //[Required(ErrorMessage = "Obligatorio")]
+        //[RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten caracteres numéricos.")]
         public string? NoEmpleado { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
-        [RegularExpression(@"^[a-zA-z0-9]+$", ErrorMessage = "Solo se permiten caracteres alfanuméricos.")]
+        //[RegularExpression(@"^[a-zA-z0-9]+$", ErrorMessage = "Solo se permiten caracteres alfanuméricos.")]
         public string? Rfc { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
         [MaxLength(150, ErrorMessage = "Ingresar máximo 150 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
+        //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
         public string? Cargo { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]
         [MaxLength(150, ErrorMessage = "Ingresar máximo 150 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
+        //[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo se permiten caracteres alfabéticos.")]
         public string? UnidadAdministrativa { get; set; }
 
 
         [Required(ErrorMessage = "Obligatorio")]
         [MaxLength(50, ErrorMessage = "Ingresar máximo 50 caracteres.")]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "El formato del correo no es válido.")]
+        //[RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "El formato del correo no es válido.")]
         public string? CorreoElectronico { get; set; }
 
         [Required(ErrorMessage = "Obligatorio")]

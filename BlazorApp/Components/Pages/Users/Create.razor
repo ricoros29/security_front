@@ -65,7 +65,7 @@
                         <div class="col-md-4">
                             <label for="correoelectronico" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
                             <InputText id="correoelectronico" type="email" @bind-Value="user!.CorreoElectronico"
-                                       class="form-control" placeholder="email@example.com.mx" aria-label="CorreoElectronico" disabled="@IsDisabled" />
+                                       class="form-control credential" placeholder="email@example.com.mx" aria-label="CorreoElectronico" disabled="@IsDisabled" />
                             <ValidationMessage For="() => user!.CorreoElectronico" class="text-danger" />
                         </div>
                         <div class="col-md-4">
@@ -160,6 +160,7 @@
             }
         </div>
     </div>
+    <ConfirmDialog @ref="dialog" />
     @if (user != null)
     {
         <div class="alert alert-light" role="alert">
@@ -222,8 +223,7 @@
         if (IsSubmitting)
             return;
 
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", "¿Deseas continuar?");
-        if (!confirmed)
+        if (!await ConfirmationAsync())
             return;
 
         try
@@ -303,7 +303,7 @@
         }
         catch (Exception ex)
         {
-            this.error = ex.Message;
+            this.error = "Error: " +  ex.Message + (ex.InnerException != null? ex.InnerException.Message : string.Empty);
             _logger.LogError(ex.Message);
             user.Cuenta = string.Empty;
         }
@@ -353,5 +353,27 @@
         {
             this.error = ex.Message;
         }
+    }
+
+    private ConfirmDialog dialog = default!;
+
+    private async Task<bool> ConfirmationAsync()
+    {
+        var options = new ConfirmDialogOptions
+        {
+            AutoFocusYesButton = false,
+            Size = DialogSize.Small,
+            YesButtonText = "Aceptar",
+            YesButtonColor = ButtonColor.Primary,
+            NoButtonText = "Cancelar",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(
+            title: "Confirmación",
+            message1: "¿Deseas continuar?",
+            confirmDialogOptions: options);
+
+        return confirmation;
     }
 }

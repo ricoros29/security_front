@@ -46,13 +46,14 @@
 
                         <div class="col-12">
                             <div class="d-grid gap-2 d-md-block">
-                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+                                @* <Button  @onclick="ShowConfirmationAsync"> Delete Employee </Button> *@
+                                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" disabled="@IsSubmitting">
                                     @if (IsLoading)
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
                                     Guardar<i class="bi bi-floppy2-fill"></i>
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -69,7 +70,7 @@
             }
         </div>
     </div>
-    @* <ConfirmMessage ConfirmedChanged="Confirm" /> *@
+    <ConfirmDialog @ref="dialog" />
     @if (userReset != null)
     {
         <div class="alert alert-light" role="alert">
@@ -124,11 +125,12 @@
                 if (user != null)
                 {
                     userReset = new ResetDTO()
-                        {
-                            IdUsuario = user.IdUsuario,
-                            Cuenta = user.Cuenta
-                        };
-                };
+                    {
+                        IdUsuario = user.IdUsuario,
+                        Cuenta = user.Cuenta
+                    };
+                }
+                ;
             }
         }
         catch (Exception ex)
@@ -147,7 +149,7 @@
         if (IsSubmitting)
             return;
 
-        if (!await JS.InvokeAsync<bool>("confirm", $"¿Deseas continuar?"))
+        if (!await ConfirmationAsync())
             return;
 
         try
@@ -168,10 +170,15 @@
             var actualizo = await _service.PutAsync<bool>($"/api/user/Reset/{Id}", userReset, token);
 
             if (actualizo == true)
+            {
                 message = $"La contraseña ha sido actualizada.";
-            //navigation.NavigateTo($"user/details?id={user.IdUsuario}");
+                userReset.Password = string.Empty;
+                userReset.PasswordConfirm = string.Empty;
+            }
             else
+            {
                 message = $"No hay datos por actualizar.";
+            }
         }
         catch (Exception ex)
         {
@@ -186,9 +193,26 @@
         }
     }
 
-    // public void Confirm(bool test)
-    // {
-    //     Console.WriteLine(test);
-    // }
+    private ConfirmDialog dialog = default!;
+
+    private async Task<bool> ConfirmationAsync()
+    {
+        var options = new ConfirmDialogOptions
+        {
+            AutoFocusYesButton = false,
+            Size = DialogSize.Small,
+            YesButtonText = "Aceptar",
+            YesButtonColor = ButtonColor.Primary,
+            NoButtonText = "Cancelar",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(
+            title: "Confirmación",
+            message1: "¿Deseas continuar?",
+            confirmDialogOptions: options);
+
+        return confirmation;
+    }
 
 }
