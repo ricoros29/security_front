@@ -16,7 +16,7 @@
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="input-group">
-                                <span class="input-group-text" id="inputGroup-sizing-sm"><i class="bi bi-person-fill"></i></span>
+                                <span class="input-group-text" id="inputGroup-sizing-sm"><Icon Name="IconName.PersonFill" /></span>
                                 <InputText id="username" @bind-Value="credentials.Username" class="form-control credential" autocomplete="off" placeholder="Usuario" aria-describedby="inputGroup-sizing-sm" />
                             </div>
                             <ValidationMessage For="() => credentials.Username" class="text-danger" />
@@ -25,7 +25,7 @@
                     <div class="row mb-5">
                         <div class="col-12">
                             <div class="input-group">
-                                <span class="input-group-text" id="inputGroup-sizing-sm-pwd"><i class="bi bi-key-fill"></i></span>
+                                <span class="input-group-text" id="inputGroup-sizing-sm-pwd"><Icon Name="IconName.KeyFill" /></span>
                                 <InputText type="password" id="password" @bind-Value="credentials.Password" class="form-control credential" placeholder="Contraseña" aria-describedby="inputGroup-sizing-sm-pwd" />
                             </div>
                             <ValidationMessage For="() => credentials.Password" class="text-danger" />

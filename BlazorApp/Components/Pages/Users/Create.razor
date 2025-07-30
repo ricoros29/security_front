@@ -135,13 +135,13 @@
                         </div>
                         <div class="col-12">
                             <div class="d-grid gap-2 d-md-block">
-                                <button type="reset" class="btn btn-primary" @onclick="ClearForm">Nuevo<i class="bi bi-person-plus-fill"></i></button>
+                                <button type="reset" class="btn btn-primary" @onclick="ClearForm">Nuevo<Icon Name="IconName.PersonPlusFill" /></button>
                                 <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
                                     @if (IsLoading)
                                     {
                                         <span class="spinner-border spinner-border-sm mr-1"></span>
                                     }
-                                    Guardar<i class="bi bi-floppy2-fill"></i>
+                                    Guardar<Icon Name="IconName.Floppy2Fill" />
                                 </button>
                             </div>
                         </div>
