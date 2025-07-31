@@ -277,7 +277,7 @@
         try
         {
             this.ListaEstados = await _service.GetCatalogo("estados", token);
-            this.ListaDependencias = await _service.GetCatalogo("dependenciaorigen", token);
+            this.ListaDependencias = await _service.GetCatalogo("dependenciaorigen", token); // Se cargan todos para evitar problemas con usuarios CNB ya que se guargan con idestado 9 en vez de 33.
             this.ListaModulos = await _service.GetCatalogo("modulos", token);
         }
         catch (Exception)
