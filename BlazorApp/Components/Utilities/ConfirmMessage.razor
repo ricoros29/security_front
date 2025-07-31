@@ -1,0 +1,33 @@
+﻿<ConfirmDialog @ref="dialog" OnConfirmed="ConfirmationAsync"/>
+
+@code {
+
+    [Parameter] public string Title { get; set; } = "Confirmación";
+    [Parameter] public string Message1 { get; set; } = "";
+    [Parameter] public string Message2 { get; set; } = "¿Deseas continuar?";
+    [Parameter] public DialogSize Size { get; set; } = DialogSize.Small;
+
+    private ConfirmDialog dialog = default!;
+
+    public async Task<bool> ConfirmationAsync()
+    {
+        var options = new ConfirmDialogOptions
+        {
+            AutoFocusYesButton = false,
+            Size = this.Size,
+            YesButtonText = "Aceptar",
+            YesButtonColor = ButtonColor.Primary,
+            NoButtonText = "Cancelar",
+            NoButtonColor = ButtonColor.Danger
+        };
+
+        var confirmation = await dialog.ShowAsync(
+            title: this.Title,
+            message1: this.Message1,
+            message2: this.Message2,
+            confirmDialogOptions: options);
+
+        return confirmation;
+    }
+
+}

@@ -1,10 +1,10 @@
 ﻿@page "/user/reset"
+@using BlazorApp.Components.Utilities
 @inject ILogger<IUser> _logger
 @inject IConfiguration configuration
 @inject NavigationManager navigation
 @rendermode InteractiveServer
 @attribute [StreamRendering]
-@inject IJSRuntime JS
 
 <PageTitle>Resetear contraseña</PageTitle>
 
@@ -70,7 +70,7 @@
             }
         </div>
     </div>
-    <ConfirmDialog @ref="dialog" />
+    <ConfirmMessage @ref="dialog" />
     @if (userReset != null)
     {
         <div class="alert alert-light" role="alert">
@@ -88,6 +88,7 @@
     private string error = string.Empty;
     protected bool IsDisabled { get; set; } = false;
     protected bool IsSubmitting { get; set; } = false;
+    private ConfirmMessage dialog = default!;
 
     [SupplyParameterFromQuery]
     public int Id { get; set; }
@@ -149,7 +150,7 @@
         if (IsSubmitting)
             return;
 
-        if (!await ConfirmationAsync())
+        if (!await dialog.ConfirmationAsync())
             return;
 
         try
@@ -171,7 +172,7 @@
 
             if (actualizo == true)
             {
-                message = $"La contraseña ha sido actualizada.";
+                message = $"La contraseña ha sido actualizada por: {userReset.Password}";
                 userReset.Password = string.Empty;
                 userReset.PasswordConfirm = string.Empty;
             }
@@ -193,26 +194,5 @@
         }
     }
 
-    private ConfirmDialog dialog = default!;
-
-    private async Task<bool> ConfirmationAsync()
-    {
-        var options = new ConfirmDialogOptions
-        {
-            AutoFocusYesButton = false,
-            Size = DialogSize.Small,
-            YesButtonText = "Aceptar",
-            YesButtonColor = ButtonColor.Primary,
-            NoButtonText = "Cancelar",
-            NoButtonColor = ButtonColor.Danger
-        };
-
-        var confirmation = await dialog.ShowAsync(
-            title: "Confirmación",
-            message1: "¿Deseas continuar?",
-            confirmDialogOptions: options);
-
-        return confirmation;
-    }
 
 }
